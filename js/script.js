@@ -1,7 +1,12 @@
 var framesRGBA=[];
 var framesRGB=[];
-var bins=[[]];
+var bins=[];
 var SD=[];//Frame Differences
+
+var mean=0;
+var alpha=1;
+var standard_deviation=0;
+var Tb=0;
 
 
 function toDataURL(url, callback){
@@ -75,21 +80,24 @@ function handleFileSelect(evt) {
     }
 
 }
-function CreateBins(arr) {
-    var tempBin=[[]];
+function CreateBins(arr,file_number) {
+    var tempBin=[];
     var prev=null;
     var colors;
-    arr.sort();
+    arr.sort(); //sort in ascending order
+    // arr.reverse(); //reverse the order
+    var j=0;
     for(var i=0;i<arr.length;i++){
         if ( arr[i] !== prev ) {
-            tempBin.push(arr[i]);
-            tempBin[arr[i]]=[];
-            tempBin[arr[i]].push(1);
+            j=arr[i];
+            tempBin[j]=1;
+            
         } else {
-            tempBin[prev][0]++;
+            tempBin[prev]++;
         }
         prev = arr[i];
     }
+    
 
 
     // arr.sort();
@@ -140,6 +148,40 @@ function getColorIndicesForCoord(x, y, width) {
 }
 
 function ComputeFrameToFrameDifferences(){
+  SD=[];
+  // bins.shift();
+  if(bins.length<=1){
+    alert("Please load more than 1 frame");
+    return;
+  }
+  for(var i=1;i<bins.length;i++){
+    var sum=0;
+    for(var j=0;j<bins[i].length-1;j++){
+      console.log("i="+i+" , j="+j + " bin1: "+bins[i][j] + " | bin2:" +bins[i-1][j]);
+      if(bins[i][j]!=null && bins[i-1][j]!=null)
+        sum+=Math.abs(bins[i][j]-bins[i-1][j]);
 
+    }
+    SD.push(sum);
+  }
+}
+
+function ComputeTb(){
+  //compute for the average of SD
+  var sum=0;
+  // var mean=0;
+  for(var i=0;i<SD.length-1;i++){
+    sum+=SD[i];
+  }
+  mean=sum/SD.length;
+
+
+  //compute for standard deviation
+  sum=0;
+  for(var i=0;i<SD.length-1;i++){
+    sum+=Math.pow((SD[i]-mean),2);
+  }
+  standard_deviation = Math.sqrt(sum/SD.length);
+  Tb=mean+(alpha*standard_deviation);
 }
       
