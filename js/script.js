@@ -1,3 +1,4 @@
+var imageDataArray=[];
 var framesRGBA=[];
 var framesRGB=[];
 var bins=[];
@@ -7,6 +8,7 @@ var mean=0;
 var alpha=0;
 var standard_deviation=0;
 var Tb=0;
+var camera_breaks=[];
 
 
 function toDataURL(url, callback){
@@ -64,7 +66,8 @@ function handleFileSelect(evt) {
                 // console.log(canvas.toDataURL() === dataURL); // false - not same data
 
                 var imgData = context.getImageData(0,0,theImage.naturalWidth, theImage.naturalHeight);
-                CreateBins(imgData.data);
+                imageDataArray.push(imgData);
+                // CreateBins(imgData.data);
                 // createRGB(imgData);
                 // framesRGBA.push(imgData);
                 // console.log(imgData);
@@ -80,7 +83,7 @@ function handleFileSelect(evt) {
     }
 
 }
-function CreateBins(arr,file_number) {
+function CreateBins(arr) {
     var tempBin=[];
     var prev=null;
     var colors;
@@ -148,6 +151,13 @@ function getColorIndicesForCoord(x, y, width) {
 }
 
 function ComputeFrameToFrameDifferences(){
+  // imageDataArray.shift();
+  bins=[];
+  document.getElementById('video-segment').innerHTML="";
+  for(var i=0;i<imageDataArray.length;i++){
+    CreateBins(imageDataArray[i].data);
+  }
+  
   SD=[];
   // bins.shift();
   if(bins.length<=1){
@@ -201,5 +211,37 @@ function ComputeTb(){
   span.innerHTML ="µ: "+mean+"<br>" + "σ: "+standard_deviation+"<br>"+"Tb: "+Tb+"<br>";
   document.getElementById('video-segment').appendChild(span);
 
+}
+
+function MarkCameraBreaks(){
+  for(var i=0;i<SD.length-1;i++){
+    if(SD[i]>Tb){
+      camera_breaks.push(SD[i]);
+    }
+  }
+}
+
+function ComputeTs(){
+  //compute for the average of SD
+  var sum=0;
+  // var mean=0;
+  for(var i=0;i<SD.length-1;i++){
+    sum+=SD[i];
+  }
+  mean=sum/SD.length;
+
+
+  //compute for standard deviation
+  sum=0;
+  for(var i=0;i<SD.length-1;i++){
+    sum+=Math.pow((SD[i]-mean),2);
+  }
+  standard_deviation = Math.sqrt(sum/SD.length);
+  alpha=parseInt(document.getElementById("txt-alpha").value);
+  Tb=mean+(alpha*standard_deviation);
+
+  var span = document.createElement('span');
+  span.innerHTML ="µ: "+mean+"<br>" + "σ: "+standard_deviation+"<br>"+"Tb: "+Tb+"<br>";
+  document.getElementById('video-segment').appendChild(span);  
 }
       
