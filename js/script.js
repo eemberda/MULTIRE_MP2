@@ -59,7 +59,8 @@ function handleFileSelect(evt) {
                 // console.log(canvas.toDataURL() === dataURL); // false - not same data
 
                 var imgData = context.getImageData(0,0,theImage.naturalWidth, theImage.naturalHeight);
-                createRGB(imgData);
+                CreateBins(imgData.data);
+                // createRGB(imgData);
                 // framesRGBA.push(imgData);
                 // console.log(imgData);
             });   
@@ -75,18 +76,35 @@ function handleFileSelect(evt) {
 
 }
 function CreateBins(arr) {
-    var tempBin=[];
+    var tempBin=[[]];
     var prev=null;
+    var colors;
     arr.sort();
-    for ( var i = 0; i < arr.length; i++ ) {
+    for(var i=0;i<arr.length;i++){
         if ( arr[i] !== prev ) {
-            temp.push(arr[i]);
-            bins[arr[i]].push(1);
+            tempBin.push(arr[i]);
+            tempBin[arr[i]]=[];
+            tempBin[arr[i]].push(1);
         } else {
-            bins[arr[i]][prev]++;
+            tempBin[prev][0]++;
         }
         prev = arr[i];
     }
+
+
+    // arr.sort();
+    console.log(arr);
+    console.log(tempBin);
+    // for ( var i = 0; i < arr.length; i++ ) {
+    //     if ( arr[i] !== prev ) {
+    //         tempBin.push(arr[i]);
+    //         tempBin[arr[i]].push(1);
+    //     } else {
+    //         tempBin[arr[i]][prev]++;
+    //     }
+    //     prev = arr[i];
+    // }
+    bins.push(tempBin);
 }
 
 function createRGB(imgData){
@@ -113,6 +131,7 @@ function createRGB(imgData){
         framesRGB.push([redForCoord,greenForCoord,blueForCoord]);
     }
     console.log("done");
+
 }
 
 function getColorIndicesForCoord(x, y, width) {
@@ -121,8 +140,6 @@ function getColorIndicesForCoord(x, y, width) {
 }
 
 function ComputeFrameToFrameDifferences(){
-  for(var i=0;i<framesRGB.length;i++){
-    bins=CreateBins(framesRGB[i]);
-  }
+
 }
       
