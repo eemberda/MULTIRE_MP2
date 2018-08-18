@@ -214,9 +214,10 @@ function ComputeTb(){
 }
 
 function MarkCameraBreaks(){
+  camera_breaks=[];
   for(var i=0;i<SD.length-1;i++){
     if(SD[i]>Tb){
-      camera_breaks.push(SD[i]);
+      camera_breaks.push([i,SD[i]]);
     }
   }
 }
