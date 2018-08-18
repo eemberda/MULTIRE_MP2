@@ -1,0 +1,151 @@
+<!--
+	Eric John G. Emberda
+	Clyde Chester R. Balaman
+	De La Salle University
+
+	This program demonstrates video retrieval
+	
+	Sources: 
+	https://www.html5rocks.com/en/tutorials/file/dndfiles/
+	https://stackoverflow.com/questions/934012/get-image-data-in-javascript
+-->
+
+<html>
+<head>
+	<script src="js/script.js" type="text/javascript"></script>
+	<script src="js/jquery-3.3.1.min.js" type="text/javascript" ></script>
+	<script src="js/bootstrap.bundle.min.js" type="text/javascript" ></script>
+	<script src="js/bootstrap.js" type="text/javascript" ></script>
+	<script src="js/bootstrap.min.js" type="text/javascript" ></script>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css" ></link>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" ></link>
+	<script>
+		// Check for the various File API support.
+		if (window.File && window.FileReader && window.FileList && window.Blob) {
+		  // Great success! All the File APIs are supported.
+		} else {
+		  alert('The File APIs are not fully supported in this browser.');
+		}	
+	</script>
+	<style>
+	  body{
+	  	background-color: #eeeeee;
+	  }
+	  .thumb {
+	    height: 75px;
+	    border: 1px solid #000;
+	    margin: 10px 5px 0 0;
+	  }
+	  .first-col{
+		background-color:#eeeeee;
+		/*color:#ffffff;*/
+		border:1px solid #ccc;
+	  }
+	  .second-col{
+		background-color:#eeeeee;
+		border:1px solid #ccc;
+	  }
+	  .third-col{
+		background-color:#eeeeee;
+		border:1px solid #ccc;
+	  }
+	  .dark-theme{
+	  	background-color:#333333;
+	  	color:#ffffff;
+	  }
+	</style>	
+</head>
+
+
+<body>
+	<div class="jumbotron text-center dark-theme">
+		<h1>Multimedia Information Retrieval</h1>
+		<p>Machine Problem 2</p> 
+		<p>Balaman, Clyde</p>
+		<p>Emberda, Eric</p>
+	</div>
+	<div class="container-fluid">
+	  <div class="row"><!--first row-->
+	    <div class="col-sm-4 first-col">
+	    	<div class="row">
+	    		<div class="col-sm">
+			    	<h4>Step 1</h4>
+		      		<h3>Load Video Frames(s)</h3>
+	      		</div>
+      		</div>
+      		<div class="row">
+				<div class="col-sm">
+					<label for="files" class="btn btn-primary"> Load Frames</label>
+					<input type="file" id="files" name="files[]" multiple style="display:none;" /><br>
+
+					<h4>Video Frames</h4>
+					<output id="list"></output>			
+				</div>      				
+      		</div>
+	    </div>
+	    <div class="col-sm-4 second-col">
+	    	<h4>Step 2</h4>
+	    	<h3>Choose Video Segmentation Method</h3>	    	
+	    	<div class="row">
+	    		<div class="col-sm">
+			    	<ul class="list-group">
+			    		<li class="list-group-item"><input type="radio" name="retrieval_method" value="color_histogram" checked /> Shot-boundary Detection Using the Twin-comparison</li>
+			    		<li class="list-group-item"><input type="radio" name="retrieval_method" value="CH_perceptual" /> Average Histogram Technique</li>
+					</ul>
+		    	</div>
+		    </div>
+	    </div>
+	    <div class="col-sm-4 second-col">
+	    	<h4>Step 3</h4>
+	    	<h3>Shot Boundaries</h3>	  
+			<button type="button" class="btn btn-primary" id="btn-start-video-segmentation" >Start Video Segmentation</button>
+	    </div>
+	  </div>
+	  <div class="row"><!--second row-->
+	    <div class="col-sm">
+	    </div>
+	    <div class="col-sm">
+	    </div>
+	  </div>
+	  <div class="row"><!--third row-->
+	  	<div class="col-sm">&nbsp;</div>
+	  	<div class="col-sm">
+
+	  	</div>
+	  	<div class="col-sm">&nbsp;</div>
+
+	  </div>
+	  </div>
+	</div>
+
+
+
+
+	<script>
+		var frames_loaded=false;
+		
+		$("#btn-start-video-segmentation").prop('disabled', true);
+
+		$('#files').change(function(e){
+			handleFileSelect(e);
+			frames_loaded = ($('#list').innerHTML!="");
+			changeStartSearchButtonStatus();
+		});
+
+		$('#btn-start-video-segmentation').click(function(e){
+			ComputeFrameToFrameDifferences();
+		});
+
+		function changeStartSearchButtonStatus(){		
+			console.log(frames_loaded);
+			if(frames_loaded)
+				$("#btn-start-video-segmentation").prop('disabled', false);
+			else
+				$("#btn-start-video-segmentation").prop('disabled', true);
+		}
+
+
+  	</script>	
+  
+</body>
+</html>
