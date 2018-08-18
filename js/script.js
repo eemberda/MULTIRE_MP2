@@ -4,7 +4,7 @@ var bins=[];
 var SD=[];//Frame Differences
 
 var mean=0;
-var alpha=1;
+var alpha=0;
 var standard_deviation=0;
 var Tb=0;
 
@@ -52,7 +52,7 @@ function handleFileSelect(evt) {
 
             var theImage = document.getElementById(escape(theFile.name));
             toDataURL(theImage.src, function(dataURL){
-                console.log(dataURL);
+                // console.log(dataURL);
 
                 // now just to show that passing to a canvas doesn't hold the same results
                 var canvas = document.createElement('canvas');
@@ -101,8 +101,8 @@ function CreateBins(arr,file_number) {
 
 
     // arr.sort();
-    console.log(arr);
-    console.log(tempBin);
+    // console.log(arr);
+    // console.log(tempBin);
     // for ( var i = 0; i < arr.length; i++ ) {
     //     if ( arr[i] !== prev ) {
     //         tempBin.push(arr[i]);
@@ -157,13 +157,25 @@ function ComputeFrameToFrameDifferences(){
   for(var i=1;i<bins.length;i++){
     var sum=0;
     for(var j=0;j<bins[i].length-1;j++){
-      console.log("i="+i+" , j="+j + " bin1: "+bins[i][j] + " | bin2:" +bins[i-1][j]);
+      // console.log("i="+i+" , j="+j + " bin1: "+bins[i][j] + " | bin2:" +bins[i-1][j]);
       if(bins[i][j]!=null && bins[i-1][j]!=null)
         sum+=Math.abs(bins[i][j]-bins[i-1][j]);
 
     }
     SD.push(sum);
   }
+
+  //display the SD
+  var span = document.createElement('span');
+  var htmlText = "<ul>";
+
+  for(var i=0;i<SD.length;i++){
+    htmlText = htmlText + "<li>SD " + (i+1) + ": "+SD[i]+"</li>";
+  }
+  span.innerHTML = htmlText + "</ul>";
+  document.getElementById('video-segment').insertBefore(span, null);
+
+
 }
 
 function ComputeTb(){
@@ -182,6 +194,12 @@ function ComputeTb(){
     sum+=Math.pow((SD[i]-mean),2);
   }
   standard_deviation = Math.sqrt(sum/SD.length);
+  alpha=parseInt(document.getElementById("txt-alpha").value);
   Tb=mean+(alpha*standard_deviation);
+
+  var span = document.createElement('span');
+  span.innerHTML ="µ: "+mean+"<br>" + "σ: "+standard_deviation+"<br>"+"Tb: "+Tb+"<br>";
+  document.getElementById('video-segment').appendChild(span);
+
 }
       
