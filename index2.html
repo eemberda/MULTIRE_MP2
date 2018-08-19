@@ -134,7 +134,10 @@
 				ComputeTs();
 			}
 			else if(document.getElementById("average_histogram").checked){
-
+				ComputeFrameToFrameDifferences();
+				ComputeTb();
+				MarkCameraBreaks();
+				ComputeNormalizedHistogram();
 			}
 		});
 

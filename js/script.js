@@ -13,6 +13,7 @@ var camera_break_ts=[];
 var frame_count=0;
 
 var normalized_histogram=[];
+var normalized_histogram_key_frames=[];
 
 function toDataURL(url, callback){
     var xhr = new XMLHttpRequest();
@@ -127,13 +128,59 @@ function CreateBins(arr) {
 
 function ComputeNormalizedHistogram(){
   var temp_norm_histogram=[];
-  for(var i=0;i<bins.length;i++){
-    var size=bins[i].length;
-    for(var j=0;j<size;j++){
-      temp_norm_histogram.push([bins[i][j],(bins[i][j]/size)]);
+  normalized_histogram=[];
+  // for(var i=0;i<bins.length;i++){
+  //   var size=bins[i].length;
+  //   for(var j=0;j<size;j++){
+  //     temp_norm_histogram.push([bins[i][j],(bins[i][j]/size)]);
+  //   }
+  //   normalized_histogram.push(temp_norm_histogram);
+  // }
+  var span = document.createElement('span');
+  var html ="Key Frames:<br>";
+  for(var i=0;i<camera_breaks.length;i++){
+    if(i==0){
+      frame_start=0;
+      frame_end=camera_breaks[i][0];
     }
-    normalized_histogram.push(temp_norm_histogram);
-  }
+    else if(i==camera_breaks.length-1){
+      frame_start=camera_breaks[i][0];
+      frame_end=frame_count-1;
+    }
+    else{
+      frame_start=camera_breaks[i-1][0]+1;
+      frame_end=camera_breaks[i][0];
+    }
+
+    //compute for normalized histogram per shot
+    var total_frequency=0;
+    var average_frequency_pixels=0
+    var temp_key_frame;
+    for(var j=frame_start;j<=frame_end;j++){
+      var diff=(imageDataArray[j].width * imageDataArray[j].height);
+        var size=bins[j].length;
+        var total_pixels = (imageDataArray[j].width * imageDataArray[j].height);
+        var temp_norm_histogram2 = 0;
+        for(var y=0;y<size;y++){
+          temp_norm_histogram[y]=(bins[j][y]/total_pixels);
+          temp_norm_histogram2+=(bins[j][y]/total_pixels);
+          total_frequency+=bins[j][y];
+        }
+        temp_norm_histogram2 = temp_norm_histogram2/size;
+        average_frequency_pixels = total_frequency/256;
+        normalized_histogram[j]=temp_norm_histogram;
+        var temp_diff=Math.abs(average_frequency_pixels-temp_norm_histogram2);
+        if(temp_diff<diff){
+          temp_key_frame = j+1;
+          diff=temp_diff;
+        }
+    }
+    normalized_histogram_key_frames.push(temp_key_frame);
+    html+=temp_key_frame+"<br>";
+
+  }  
+  span.innerHTML = html;
+  document.getElementById('video-segment').appendChild(span);
 }
 
 function ChooseKeyFrameNormalizedHistogram(){
