@@ -36,6 +36,7 @@ function handleFileSelect(evt) {
     var list = document.getElementById('list');
     list.innerHTML="";
     framesRGBA=[];
+    var counter=0;
     // Loop through the FileList and render image files as thumbnails.
     for (var i = 0, f; f = files[i]; i++) {
       // Only process image files.
@@ -48,8 +49,9 @@ function handleFileSelect(evt) {
         return function(e) {
           // Render thumbnail.
             var span = document.createElement('span');
-            span.innerHTML = ['<img id="', escape(theFile.name),'" class="thumb" src="', e.target.result,
-                            '" title="', escape(theFile.name), '"/>'].join('');
+            counter++;
+            span.innerHTML = ['Frame ',escape(counter),': <img id="', escape(theFile.name),'" class="thumb" src="', e.target.result,
+                            '" title="', escape(theFile.name), '"/><br>'].join('');
             document.getElementById('list').insertBefore(span, null);
 
             var theImage = document.getElementById(escape(theFile.name));
@@ -215,11 +217,20 @@ function ComputeTb(){
 
 function MarkCameraBreaks(){
   camera_breaks=[];
-  for(var i=0;i<SD.length-1;i++){
+
+  //display the camera breaks
+  var span = document.createElement('span');
+  var htmlText = "Camera Breaks:<br><ul>";
+
+  for(var i=0;i<SD.length;i++){
     if(SD[i]>Tb){
       camera_breaks.push([i,SD[i]]);
+      htmlText = htmlText + "<li>SD: " + (i+1) + ": "+SD[i]+"</li>";
     }
   }
+  span.innerHTML = htmlText + "</ul>";
+  document.getElementById('video-segment').appendChild(span);
+
 }
 
 function ComputeTs(){
