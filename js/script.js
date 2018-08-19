@@ -59,7 +59,7 @@ function handleFileSelect(evt) {
             span.innerHTML = ['Frame ',escape(counter),'<br><img id="', escape(theFile.name),'" class="thumb" src="', e.target.result,
                             '" title="', escape(theFile.name), '"/><br><br>'].join('');
             document.getElementById('list').insertBefore(span, null);
-
+            document.getElementById("video-frames").innerHTML=frame_count;
             var theImage = document.getElementById(escape(theFile.name));
             toDataURL(theImage.src, function(dataURL){
                 // console.log(dataURL);
@@ -89,6 +89,7 @@ function handleFileSelect(evt) {
       reader.readAsDataURL(f);
 
     }
+
 
 }
 function CreateBins(arr) {
