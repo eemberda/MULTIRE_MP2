@@ -54,8 +54,9 @@ function handleFileSelect(evt) {
             var span = document.createElement('span');
             counter++;
             frame_count++;
-            span.innerHTML = ['Frame ',escape(counter),': <img id="', escape(theFile.name),'" class="thumb" src="', e.target.result,
-                            '" title="', escape(theFile.name), '"/><br>'].join('');
+            span.style="float:left;";
+            span.innerHTML = ['Frame ',escape(counter),'<br><img id="', escape(theFile.name),'" class="thumb" src="', e.target.result,
+                            '" title="', escape(theFile.name), '"/><br><br>'].join('');
             document.getElementById('list').insertBefore(span, null);
 
             var theImage = document.getElementById(escape(theFile.name));
@@ -124,11 +125,37 @@ function CreateBins(arr) {
     bins.push(tempBin);
 }
 
-function computeNormalizedHistogram(){
+function ComputeNormalizedHistogram(){
+  var temp_norm_histogram=[];
   for(var i=0;i<bins.length;i++){
     var size=bins[i].length;
     for(var j=0;j<size;j++){
-      
+      temp_norm_histogram.push([bins[i][j],(bins[i][j]/size)]);
+    }
+    normalized_histogram.push(temp_norm_histogram);
+  }
+}
+
+function ChooseKeyFrameNormalizedHistogram(){
+  var frame_start;
+  var frame_end;
+
+  for(var i=0;i<camera_breaks.length;i++){
+    if(i==0){
+      frame_start=0;
+      frame_end=camera_breaks[i][0];
+    }
+    else if(i==camera_breaks.length-1){
+      frame_start=camera_breaks[i][0];
+      frame_end=frame_count-1;
+    }
+    else{
+      frame_start=camera_breaks[i-1][0]+1;
+      frame_end=camera_breaks[i][0];
+    }
+
+    for(var j=frame_start;j<=frame_end;j++){
+
     }
   }
 }
