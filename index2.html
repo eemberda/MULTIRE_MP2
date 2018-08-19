@@ -89,8 +89,8 @@
 	    	<div class="row">
 	    		<div class="col-sm">
 			    	<ul class="list-group">
-			    		<li class="list-group-item"><input type="radio" name="retrieval_method" value="color_histogram" checked /> Shot-boundary Detection Using the Twin-comparison</li>
-			    		<li class="list-group-item"><input type="radio" name="retrieval_method" value="CH_perceptual" /> Average Histogram Technique</li>
+			    		<li class="list-group-item"><input type="radio" name="retrieval_method" id="shot_boundary" checked /> Shot-boundary Detection Using the Twin-comparison</li>
+			    		<li class="list-group-item"><input type="radio" name="retrieval_method" id="average_histogram" /> Average Histogram Technique</li>
 					</ul>
 		    	</div>
 		    </div>
@@ -127,9 +127,15 @@
 		});
 
 		$('#btn-start-video-segmentation').click(function(e){
-			ComputeFrameToFrameDifferences();
-			ComputeTb();
-			MarkCameraBreaks();
+			if(document.getElementById("shot_boundary").checked){
+				ComputeFrameToFrameDifferences();
+				ComputeTb();
+				MarkCameraBreaks();
+				ComputeTs();
+			}
+			else if(document.getElementById("average_histogram").checked){
+
+			}
 		});
 
 		function changeStartSearchButtonStatus(){		

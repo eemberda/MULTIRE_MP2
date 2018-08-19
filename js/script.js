@@ -9,7 +9,10 @@ var alpha=0;
 var standard_deviation=0;
 var Tb=0;
 var camera_breaks=[];
+var camera_break_ts=[];
+var frame_count=0;
 
+var normalized_histogram=[];
 
 function toDataURL(url, callback){
     var xhr = new XMLHttpRequest();
@@ -50,6 +53,7 @@ function handleFileSelect(evt) {
           // Render thumbnail.
             var span = document.createElement('span');
             counter++;
+            frame_count++;
             span.innerHTML = ['Frame ',escape(counter),': <img id="', escape(theFile.name),'" class="thumb" src="', e.target.result,
                             '" title="', escape(theFile.name), '"/><br>'].join('');
             document.getElementById('list').insertBefore(span, null);
@@ -118,6 +122,15 @@ function CreateBins(arr) {
     //     prev = arr[i];
     // }
     bins.push(tempBin);
+}
+
+function computeNormalizedHistogram(){
+  for(var i=0;i<bins.length;i++){
+    var size=bins[i].length;
+    for(var j=0;j<size;j++){
+      
+    }
+  }
 }
 
 function createRGB(imgData){
@@ -236,24 +249,77 @@ function MarkCameraBreaks(){
 function ComputeTs(){
   //compute for the average of SD
   var sum=0;
-  // var mean=0;
-  for(var i=0;i<SD.length-1;i++){
-    sum+=SD[i];
-  }
-  mean=sum/SD.length;
-
-
-  //compute for standard deviation
-  sum=0;
-  for(var i=0;i<SD.length-1;i++){
-    sum+=Math.pow((SD[i]-mean),2);
-  }
-  standard_deviation = Math.sqrt(sum/SD.length);
-  alpha=parseInt(document.getElementById("txt-alpha").value);
-  Tb=mean+(alpha*standard_deviation);
-
+  var frame_start;
+  var frame_end;
+  var shot_length=0;
+  var temp_mean=0;
+  var temp_standard_deviation=0;
+  var Ts=0;
   var span = document.createElement('span');
-  span.innerHTML ="µ: "+mean+"<br>" + "σ: "+standard_deviation+"<br>"+"Tb: "+Tb+"<br>";
-  document.getElementById('video-segment').appendChild(span);  
+  var html_content="<br><h3>Grandual Transition Computation</h3><br>";
+  var AC=0;
+  var GT_potential=[];
+
+  // var mean=0;
+  for(var i=0;i<camera_breaks.length;i++){
+    if(i==0){
+      frame_start=0;
+      frame_end=camera_breaks[i][0];
+    }
+    else if(i==camera_breaks.length-1){
+      frame_start=camera_breaks[i][0];
+      frame_end=frame_count-1;
+    }
+    else{
+      frame_start=camera_breaks[i-1][0]+1;
+      frame_end=camera_breaks[i][0];
+    }
+
+    sum=0;
+    shot_length=(frame_end-frame_start);
+    for(var j=0;j<shot_length;j++){
+      sum+=SD[frame_start+j];
+    }
+    temp_mean=sum/shot_length;
+
+    sum=0;
+    for(var j=0;j<shot_length;j++){
+      sum+=Math.pow((SD[frame_start+j]-temp_mean),2);
+    }
+
+    temp_standard_deviation = Math.sqrt(sum/shot_length);
+    alpha=parseInt(document.getElementById("txt-alpha").value);
+    Ts=temp_mean+(alpha*temp_standard_deviation);
+    
+    camera_break_ts.push([temp_mean,temp_standard_deviation,Ts]);//push mean, standard deviation, and Ts
+    html_content+="<br>Camera Break # "+(i+1)+"<br>";
+    html_content+="µ: "+temp_mean+"<br>" + "σ: "+temp_standard_deviation+"<br>"+"Ts: "+Ts+"<br>";
+    span.innerHTML = html_content;
+    document.getElementById('video-segment').appendChild(span);
+
+    //compute for potential gradual transition
+    var accumulator=0;
+    var is_potential=false;
+    html_content="";
+    span = document.createElement('span');
+    for(var frame=frame_start;frame<frame_end;frame++){
+      if(SD[frame]>Ts){
+        is_potential=true;
+        GT_potential.push([frame,frame+1]);
+        html_content+="Start Frame: "+(frame_start+1)+", End Frame: "+(frame_end+1)+"<br>";
+
+      }
+      accumulator+=SD[frame];
+    }
+
+    if(is_potential){
+      GT_potential.push([frame_start,frame_end]);
+      if(accumulator>Tb)
+        html_content+="<br><strong>Gradual Transition Detected</strong><br>";
+    }
+
+    document.getElementById('video-segment').appendChild(span);
+
+  }
 }
       
